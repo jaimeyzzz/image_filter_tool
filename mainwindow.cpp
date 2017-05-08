@@ -7,6 +7,7 @@
 #include <string>
 #include <QDebug>
 #include <QFile>
+#include <QMessageBox>
 
 using namespace IA;
 using namespace std;
@@ -261,7 +262,8 @@ void MainWindow::on_actionExportImages_triggered()
 
     lastOutputFolderPath = folder;
 
-    int errNum = 0;
+    int errNum = 0, fileNum = 0;
+    int cover = 0; // 0 : no, 1 : cover all, 2 : skip all;
     BOOST_FOREACH(Dir *dir, annotations.getDirs()) {
         BOOST_FOREACH(File* file, dir->getFiles())
         {
@@ -269,25 +271,57 @@ void MainWindow::on_actionExportImages_triggered()
             QString fileName = QString::fromStdString(annotations.fileName(file->getFilePath()));
             QString outPath = folder + "/" + fileName;
             AnnotationFlag flag = file->getFlag();
+            bool skip = false;
+
+            ui->statusBar->showMessage(tr("Copy file : \"") + fileName + "\"...");
             if (flag == AnnotationFlag::YES)
             {
                 if (!QFile::exists(filePath))
                 {
                     qDebug() << "inputNotExist";
                 }
-                while (QFile::exists(outPath))
+                if (QFile::exists(outPath))
                 {
-                    QFile::remove(outPath);
+                    if (cover == 0)
+                    {
+                        QMessageBox::StandardButton reply;
+                        reply = QMessageBox::question(this, tr("File Exist"),
+                            "file \"" + fileName + "\" exist, cover of not?",
+                            QMessageBox::Yes | QMessageBox::YesToAll | QMessageBox::No | QMessageBox::NoToAll);
+                        switch(reply)
+                        {
+                        case QMessageBox::YesToAll:
+                            cover = 1;
+                        case QMessageBox::Yes:
+                            QFile::remove(outPath);
+                            break;
+                        case QMessageBox::NoToAll:
+                            cover = 2;
+                        case QMessageBox::No:
+                            skip = true;
+                        default:
+                            break;
+                        }
+                    }
+                    else if (cover == 1)
+                    {
+                        QFile::remove(outPath);
+                    }
+                    else if (cover == 2)
+                        skip = true;
                 }
-                if (!QFile::copy(filePath, outPath))
+                if (!skip && !QFile::copy(filePath, outPath))
                 {
-                    ui->statusBar->showMessage(tr("Error copy file : ") + fileName);
+                    QMessageBox msgBox(QMessageBox::Warning, tr("Error"),
+                                       tr("Error copy file \"") + fileName + "\"", 0, this);
+                    msgBox.exec();
                     errNum ++;
                 }
+                fileNum ++;
             }
         }
     }
-    ui->statusBar->showMessage(tr("Finish copy, ") + QString::number(errNum) + tr(" errors happened."));
+    ui->statusBar->showMessage(tr("Finish copy, ") + QString::number(fileNum) + tr(" files copied, ") + QString::number(errNum) + tr(" errors happened."));
 }
 
 void MainWindow::on_actionQuit_triggered()
