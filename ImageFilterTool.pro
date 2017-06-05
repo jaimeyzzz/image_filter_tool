@@ -25,6 +25,10 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-INCLUDEPATH += C:\Boost\include\boost-1_59
+INCLUDEPATH += D:\libs\boost_1_59_0\
 
-LIBS += C:\Boost\lib\*.lib
+LIBS += D:\libs\boost1.59.0-win32-vc120\lib\*.lib # Static 32
+
+#LIBS += D:\libs\boost_1_59_0\lib64-msvc-12.0\*.lib # Static 64
+
+#LIBS += D:\libs\boost1.59.0-x64-vc120\lib\*.lib # Dynamic 64

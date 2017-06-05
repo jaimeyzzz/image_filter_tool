@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ImageFilterTool</string>
+   <string>筛选工具</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
@@ -31,7 +31,7 @@
    </property>
    <widget class="QMenu" name="fileMenu">
     <property name="title">
-     <string>File</string>
+     <string>文件</string>
     </property>
     <addaction name="actionOpenImages"/>
     <addaction name="actionOpenFolder"/>
@@ -44,11 +44,20 @@
    </widget>
    <widget class="QMenu" name="editMenu">
     <property name="title">
-     <string>Edit</string>
+     <string>工具</string>
     </property>
+    <addaction name="actionStatistic"/>
+    <addaction name="actionExportList"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <addaction name="actionShortcuts"/>
    </widget>
    <addaction name="fileMenu"/>
    <addaction name="editMenu"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -64,7 +73,7 @@
     <bool>false</bool>
    </property>
    <property name="windowTitle">
-    <string>FileView</string>
+    <string>文件列表</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -119,7 +128,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>&lt; Prev</string>
+          <string>&lt; 上一张</string>
          </property>
         </widget>
        </item>
@@ -129,7 +138,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Next &gt;</string>
+          <string>下一张 &gt;</string>
          </property>
         </widget>
        </item>
@@ -140,32 +149,53 @@
   </widget>
   <action name="actionOpenDatabase">
    <property name="text">
-    <string>&amp;Import Database</string>
+    <string>导入标注文件</string>
    </property>
   </action>
   <action name="actionSaveDatabase">
    <property name="text">
-    <string>&amp;Export Database</string>
+    <string>导出标注文件</string>
    </property>
   </action>
   <action name="actionOpenImages">
    <property name="text">
-    <string>Open Images</string>
+    <string>打开图片</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>退出
+</string>
    </property>
   </action>
   <action name="actionExportImages">
    <property name="text">
-    <string>Export Images</string>
+    <string>导出图片</string>
    </property>
   </action>
   <action name="actionOpenFolder">
    <property name="text">
-    <string>Open Folder</string>
+    <string>打开文件夹</string>
+   </property>
+  </action>
+  <action name="actionShortcuts">
+   <property name="text">
+    <string>快捷键</string>
+   </property>
+  </action>
+  <action name="actionSplitImage">
+   <property name="text">
+    <string>Split Image</string>
+   </property>
+  </action>
+  <action name="actionStatistic">
+   <property name="text">
+    <string>统计数据</string>
+   </property>
+  </action>
+  <action name="actionExportList">
+   <property name="text">
+    <string>存储图片列表</string>
    </property>
   </action>
  </widget>

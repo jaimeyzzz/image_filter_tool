@@ -6,8 +6,14 @@
 #include <boost/foreach.hpp>
 #include <string>
 #include <QDebug>
+#include <QString>
 #include <QFile>
 #include <QMessageBox>
+#include <QSize>
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <QDebug>
 
 using namespace IA;
 using namespace std;
@@ -17,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
 
     scrollArea = new ScrollAreaNoWheel(this);
     imageViewWidget = new ImageViewWidget(scrollArea, scrollArea);
@@ -327,6 +334,147 @@ void MainWindow::on_actionExportImages_triggered()
 void MainWindow::on_actionQuit_triggered()
 {
     close();
+}
+
+void MainWindow::on_actionShortcuts_triggered()
+{
+    QString shortcuts = tr("");
+    shortcuts += tr("Y：将当前图片标记为YES \n");
+    shortcuts += tr("N：将当前图片标记为NO \n");
+    shortcuts += tr("Up 上方向键：上一张图 \n");
+    shortcuts += tr("Down 下方向键：下一张图 \n");
+    QMessageBox msgBox(QMessageBox::Information, tr("Short Cuts"),
+                       shortcuts, 0, this);
+    msgBox.exec();
+}
+
+void MainWindow::on_actionSplitImage_triggered()
+{
+//    QString folder = QFileDialog::getExistingDirectory(
+//            this,
+//            "Open Images from Folder",
+//            lastImageFolderPath);
+
+//    if (folder.isEmpty())
+//        return;
+
+//    lastImageFolderPath = folder;
+//    QDirIterator it(folder, QDir::Files|QDir::Dirs|QDir::NoDotAndDotDot);
+//    while (it.hasNext())
+//    {
+//        QString name = it.next();
+//        QFileInfo info(name);
+//        if (!info.isDir())
+//        {
+//            if (info.suffix() == "jpg" || info.suffix() == "bmp" || info.suffix() == "png")
+//            {
+//                QImage image(info.absoluteFilePath());
+//                if (image.size() != QSize(8192, 4096)) continue;
+//                QImage crop0 = image.copy(1024, 1024, 3072, 3072);
+//                QImage crop1 = image.copy(1024 + 2048, 1024, 3072 + 2048, 3072);
+//                QImage crop2 = image.copy(1024 + 4096, 1024, 3072 + 4096, 3072);
+//                QImage crop3 = image.copy(8192 - 1024, 1024, 8192, 3072);
+//                QImage crop4 = image.copy(0, 1024, 1024, 3072);
+
+//            }
+//        }
+//    }
+}
+
+void MainWindow::on_actionStatistic_triggered()
+{
+    int lc = 0, yc = 0, nc = 0, tc = 0;
+    BOOST_FOREACH(Dir *dir, annotations.getDirs()) {
+        // construct a new directory entry
+        BOOST_FOREACH(File* file, dir->getFiles()) {
+            // construct a new file entry
+            //string fileName = annotations.fileName(file->getFilePath());
+            tc ++;
+            AnnotationFlag flag = file->getFlag();
+            switch(flag)
+            {
+            case YES:
+                yc ++;
+                lc ++;
+                break;
+            case NO:
+                nc ++;
+                lc ++;
+                break;
+            case UNKOWN:
+            default:
+                break;
+            }
+        }
+    }
+    QString stat = tr("共有 ") + QString::number(tc) + tr(" 张图 \n");
+    stat += tr("已标 : ") + QString::number(lc) + tr("\n");
+    stat += tr("YES : ") + QString::number(yc) + tr("\n");
+    stat += tr("NO : ") + QString::number(nc) + tr("\n");
+    QMessageBox msgBox(QMessageBox::Information, tr("Statistic"),
+                       stat, 0, this);
+    msgBox.exec();
+}
+
+// Export Image List File;
+void MainWindow::on_actionExportList_triggered()
+{
+
+    QString listPath = QFileDialog::getSaveFileName(
+            this,
+            "Save to Database",
+            lastDatabasePath,
+            "Text(*.txt)");
+
+    if (listPath.isEmpty())
+        return;
+
+    IA::ImageAnnotations tmpAnnos;
+    // remove 0 1 2 3 in image suffix;
+    BOOST_FOREACH(Dir *dir, annotations.getDirs()) {
+        // construct a new directory entry
+        BOOST_FOREACH(File* file, dir->getFiles()) {
+            // construct a new file entry
+            //string fileName = annotations.fileName(file->getFilePath());
+            AnnotationFlag flag = file->getFlag();
+            string filePath;
+            switch(flag)
+            {
+            case YES:
+                filePath = file->getFilePath();
+                filePath.replace(filePath.length() - 6, 2, "");
+                qDebug() << "file : " << QString::fromStdString(filePath);
+                tmpAnnos.addFile(filePath);
+                break;
+            case NO:
+            case UNKOWN:
+            default:
+                break;
+            }
+        }
+    }
+
+    std::ofstream out(listPath.toStdString().c_str(), std::ios::trunc);
+    if (!out) {
+        cerr << "export image list" << endl;
+        cerr << "\tError opening the file: " << listPath.toStdString() << endl;
+        return;
+    }
+
+    BOOST_FOREACH(Dir *dir, tmpAnnos.getDirs()) {
+        // construct a new directory entry
+        BOOST_FOREACH(File* file, dir->getFiles()) {
+            // construct a new file entry
+            //string fileName = annotations.fileName(file->getFilePath());
+            string name = IA::ImageAnnotations::fileName(file->getFilePath());
+            qDebug() << QString::fromStdString(name);
+
+
+            out << name << "\n";
+        }
+    }
+    out.close();
+
 }
 
 /***********
