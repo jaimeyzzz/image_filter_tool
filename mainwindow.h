@@ -39,6 +39,7 @@ public slots:
     void on_actionSplitImage_triggered();
     void on_actionStatistic_triggered();
     void on_actionExportList_triggered();
+    void on_actionExportSplitList_triggered();
     void on_fileTreeWidget_currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *);
     void on_prevButton_clicked();
     void on_nextButton_clicked();

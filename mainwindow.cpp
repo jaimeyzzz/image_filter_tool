@@ -477,6 +477,65 @@ void MainWindow::on_actionExportList_triggered()
 
 }
 
+// Export Split Image List File;
+void MainWindow::on_actionExportSplitList_triggered()
+{
+
+    QString listPath = QFileDialog::getSaveFileName(
+            this,
+            "Save to Database",
+            lastDatabasePath,
+            "Text(*.txt)");
+
+    if (listPath.isEmpty())
+        return;
+
+    IA::ImageAnnotations tmpAnnos;
+    BOOST_FOREACH(Dir *dir, annotations.getDirs()) {
+        // construct a new directory entry
+        BOOST_FOREACH(File* file, dir->getFiles()) {
+            // construct a new file entry
+            //string fileName = annotations.fileName(file->getFilePath());
+            AnnotationFlag flag = file->getFlag();
+            string filePath;
+            switch(flag)
+            {
+            case YES:
+                filePath = file->getFilePath();
+                qDebug() << "file : " << QString::fromStdString(filePath);
+                tmpAnnos.addFile(filePath);
+                break;
+            case NO:
+            case UNKOWN:
+            default:
+                break;
+            }
+        }
+    }
+
+    std::ofstream out(listPath.toStdString().c_str(), std::ios::trunc);
+    if (!out) {
+        cerr << "export image list" << endl;
+        cerr << "\tError opening the file: " << listPath.toStdString() << endl;
+        return;
+    }
+
+    BOOST_FOREACH(Dir *dir, tmpAnnos.getDirs()) {
+        // construct a new directory entry
+        BOOST_FOREACH(File* file, dir->getFiles()) {
+            // construct a new file entry
+            //string fileName = annotations.fileName(file->getFilePath());
+            string name = IA::ImageAnnotations::fileName(file->getFilePath());
+            qDebug() << QString::fromStdString(name);
+
+            out << name << "\n";
+        }
+    }
+    out.close();
+
+}
+
+
 /***********
  * Event
  */

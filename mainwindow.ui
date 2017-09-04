@@ -48,6 +48,7 @@
     </property>
     <addaction name="actionStatistic"/>
     <addaction name="actionExportList"/>
+    <addaction name="actionExportSplitList"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -196,6 +197,11 @@
   <action name="actionExportList">
    <property name="text">
     <string>存储图片列表</string>
+   </property>
+  </action>
+  <action name="actionExportSplitList">
+   <property name="text">
+    <string>存储切分图片列表</string>
    </property>
   </action>
  </widget>
